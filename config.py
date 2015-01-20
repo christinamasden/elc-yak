@@ -15,4 +15,16 @@ SCHOOLS =  [
     'Louisiana State University',
     'University of South Carolina',
     'Wake Forest University',
+    'Clemson University',
+   'Cornell University',
+   'Auburn University',
+   'Cedar Crest College',
+   'Bucknell University',
+   'The University of North Carolina at Chapel Hill',
+   'Northwestern University',
+   'University of Tennessee',
+   'Indiana University, Bloomington',
+   'University of Mississippi',
+   'The University of Kansas',
+   'University of Florida​'
 ]
