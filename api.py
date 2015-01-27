@@ -456,29 +456,23 @@ class Yakker:
 
 
 def main():
-    client = MySQLdb.connect("localhost","root","rtrad","yaks")
-    client.set_character_set('utf8')
-    cursor = client.cursor()
-    cursor.execute('SET NAMES utf8;')
-    cursor.execute('SET CHARACTER SET utf8;')
-    cursor.execute('SET character_set_connection=utf8;')
-    
     location = Location(33.775618, -84.396285)
     testyakker = Yakker('A19A029A-EE2A-4D89-AD7F-85B1BC3459EE', location, False)
     yaklist = testyakker.get_yaks()
-    print yaklist[0]
-    
+    client = MySQLdb.connect("localhost","root","rtrad","yaks")
+    cursor = client.cursor()
+
     for yak in yaklist:
-        #print cursor.execute("SELECT * FROM yak_data")
-        values = (yak["messageID"], yak["message"], str(yak["numberOfLikes"]))
-        print yak
-        try:
-            cursor.execute("""REPLACE INTO yak_data(messageid, message, numberOfLikes) VALUES (%s, %s, %s)""", values)
+            values = (yak["messageID"], yak["message"].encode('utf-8'), str(yak["numberOfLikes"]), yak["latitude"], yak["longitude"], yak["time"])
+            values2 = (str(yak["messageID"]), str(yak["numberOfLikes"]))
+            cursor.execute("""REPLACE INTO yak_data(messageID, message, numberOfLikes, latitude, longitude, time) VALUES (%s, %s, %s, %s, %s, %s)""", values)
             client.commit()
-        except:
-            print '\n'
+            cursor.execute("""INSERT INTO like_data(messageID, numberOfLikes) VALUES (%s, %s)""", values2)
+            client.commit()
 
     client.close()
+    return
+
 
 if __name__ == '__main__':
     main()
