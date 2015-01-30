@@ -1,18 +1,24 @@
 from api import Location, PeekLocation, Yakker
 from config import GOOGLE_API_KEY, YIKYAK_USER_ID, SCHOOLS
 from pygeocoder import Geocoder
-from pymongo import MongoClient
+import MySQLdb
 
 def main():
-    client = MongoClient()['elc']['messages']
+    client = MySQLdb.connect("localhost","root","rtrad","yaks")
+    cursor = client.cursor()
     for school in SCHOOLS:
         print 'Scraping {}'.format(school)
         location = get_location(school)
         yaks = get_yaks(location)
         for yak in yaks:
-            yak['school'] = school
-            client.insert(yak)
+            values = (yak["messageID"], yak["message"].encode('utf-8'), str(yak["numberOfLikes"]), yak["latitude"], yak["longitude"], yak["time"])
+            values2 = (str(yak["messageID"]), str(yak["numberOfLikes"]))
+            cursor.execute("""REPLACE INTO yak_data(messageID, message, numberOfLikes, latitude, longitude, time) VALUES (%s, %s, %s, %s, %s, %s)""", values)
+            client.commit()
+            cursor.execute("""INSERT INTO like_data(messageID, numberOfLikes) VALUES (%s, %s)""", values2)
+            client.commit()
     return
+    client.close()
 
 def get_location(query):
     geo_coder = Geocoder(api_key=GOOGLE_API_KEY)
